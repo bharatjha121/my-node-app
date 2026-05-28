@@ -1,4 +1,4 @@
-name: Deploy Node.js to EC2
+name: Deploy Node.js to EC2 via SSM
 
 on:
   push:
@@ -21,15 +21,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ${{ secrets.EC2_APP_PATH }}
-            git pull origin main
-            npm install --production
-            pm2 reload my-node-app || pm2 start server.js --name my-node-app
-            echo "Deployment complete!"
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy via SSM
+        run: |
+          aws ssm send-command \
+            --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters '{"commands":["cd /home/ubuntu/my-node-app","git pull origin main","npm install --production","pm2 reload my-node-app || pm2 start server.js --name my-node-app","echo Deployment complete!"]}' \
+            --region ${{ secrets.AWS_REGION }} \
+            --output text
