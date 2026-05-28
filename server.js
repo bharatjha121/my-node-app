@@ -4,7 +4,7 @@ const PORT = 3000;
 
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Pushed from server using ssm, ssh rule deleted just testing testing');
+  res.end('Pushed from server using ssm, ssh rule deleted just testing testing testing');
 });
 
 server.listen(PORT, () => {

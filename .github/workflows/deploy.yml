@@ -33,6 +33,6 @@ jobs:
           aws ssm send-command \
             --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
-            --parameters '{"commands":["export HOME=/root","git config --global --add safe.directory /home/ubuntu/my-node-app","cd /home/ubuntu/my-node-app","git reset --hard origin/main","git pull origin main","npm install --production","pm2 reload my-node-app || pm2 start server.js --name my-node-app","echo Deployment complete!"]}' \
+            --parameters '{"commands":["export HOME=/root","git config --global --add safe.directory /home/ubuntu/my-node-app","cd /home/ubuntu/my-node-app","git reset --hard origin/main","git pull origin main","npm install --production","sudo -u ubuntu pm2 reload my-node-app || sudo -u ubuntu pm2 start server.js --name my-node-app","echo Deployment complete!"]}' \
             --region ${{ secrets.AWS_REGION }} \
             --output text
